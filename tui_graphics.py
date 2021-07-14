@@ -25,15 +25,6 @@ settings_banner = r"""
 """
 
 
-def clear():
-    # windows
-    if name == "nt":
-        _ = system("cls")
-    # for linux and fruit-related computers
-    else:
-        _ = system("clear")
-
-
 def get_hangman_drawing(lives: int) -> str:
     m = Fore.MAGENTA
     g = Fore.GREEN

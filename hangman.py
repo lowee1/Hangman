@@ -1,7 +1,9 @@
-import click
 import string
-from colorama import init
 from random import choice
+
+import click
+from colorama import init
+
 import tui_graphics
 
 init()

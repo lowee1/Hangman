@@ -6,6 +6,8 @@ name = "pypi"
 [packages]
 click = "*"
 colorama = "*"
+pyyaml = "*"
+keyboard = "*"
 
 [dev-packages]
 flake8 = "*"

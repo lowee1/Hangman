@@ -12,9 +12,21 @@
             "console": "integratedTerminal",
             "args": [
                 "tui",
-                "play-tui"
+                "play"
             ]
         },
+        {
+            "name": "tui config hangman",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "args": [
+                "tui",
+                "config"
+            ]
+        },
+
         {
             "name": "Python: Current File",
             "type": "python",

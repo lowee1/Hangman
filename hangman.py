@@ -2,13 +2,18 @@ import string
 from random import choice
 
 import click
+import yaml
 from colorama import init
 
 import tui_graphics
 
 init()
 
-with open("words_alpha.txt", "r") as file:
+with open("config.yaml", "r") as file:
+    config = yaml.safe_load(file)
+
+
+with open(config["wordlist"], "r") as file:
     words = file.read().splitlines()
 chosen_word = choice(words).upper()
 
@@ -29,9 +34,64 @@ def tui():
     pass
 
 
-@tui.command()
+def get_wordlist():
+    while True:
+        wordlist = click.prompt("Enter path to wordlist",
+                                type=click.Path(exists=True, file_okay=True,
+                                                dir_okay=False, readable=True,
+                                                resolve_path=True))
+        with open(wordlist, "r") as file:
+            words = file.readlines()
+        if len(words) < 2:
+            click.echo("wordlist must contain at least two lines")
+            continue
+
+        if not any(map(lambda word: bool(word.strip()), words)):
+            click.echo("wordlist must not contain empty lines")
+            continue
+
+        break
+
+    return wordlist
+
+
+def get_difficulty():
+    raise NotImplementedError
+
+
+def get_drawings():
+    raise NotImplementedError
+
+
+def get_fullscreen_status():
+    return click.prompt("Would you like to play in fullscreen mode",
+                        show_choices=True, type=click.Choice(["yes", "no"]))
+
+
+@tui.command(name="config")
 def tui_settings():
-    pass
+    tui_graphics.centre_print(tui_graphics.settings_banner)
+    while True:
+        tui_graphics.centre_print(tui_graphics.settings_menu)
+        selected = click.prompt("Select option", show_choices=True,
+                                type=click.Choice(["1", "2", "3", "4", "5"]))
+        match selected:
+            case "1":
+                new_wordlist = get_wordlist()
+                config["wordlist"] = new_wordlist
+            case "2":
+                new_difficulty = get_difficulty()
+                config["difficulty"] = new_difficulty
+            case "3":
+                new_drawings = get_drawings()
+                config["drawings"] = new_drawings
+            case "4":
+                new_fullscreen_status = get_fullscreen_status()
+                config["fullscreen"] = new_fullscreen_status
+            case "5":
+                with open("config.yaml", "w") as file:
+                    yaml.dump(config, file)
+                break
 
 
 def generate_word_display(guessed_corrects: list, correct: list) -> str:
@@ -56,10 +116,12 @@ def get_letter_guess(guessed_letters: list) -> str:
                 return guess
 
 
-@tui.command()
+@tui.command(name="play")
 def play_tui():
+    if config["fullscreen"]:
+        tui_graphics.fullscreen()
     click.clear()
-    click.echo(tui_graphics.banner)
+    tui_graphics.centre_print(tui_graphics.banner)
 
     correct_letters = list(chosen_word)
     guessed_correct_letters = []
@@ -86,7 +148,7 @@ def play_tui():
             click.echo(f"{current_letter_guess} is not in the word")
             lives -= 1
 
-        if len(guessed_correct_letters) == len(correct_letters):
+        if len(guessed_correct_letters) == len(set(correct_letters)):
             won = True
             break
 
@@ -95,7 +157,9 @@ def play_tui():
     if won:
         click.echo("Well Done! You won!")
     else:
-        click.echo(f"You lose.\nThe correct word was {chosen_word}")
+        click.echo("You lose.")
+
+    click.echo(f"The correct word was {chosen_word}")
 
 
 # GUI
@@ -109,7 +173,7 @@ def gui():
 
 @gui.command()
 def launch_gui():
-    pass
+    raise NotImplementedError
 
 
 if __name__ == "__main__":

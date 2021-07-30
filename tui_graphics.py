@@ -4,8 +4,14 @@ import yaml
 import importlib
 import click
 
-with open("config.yaml", "r") as file:
-    config = yaml.safe_load(file)
+try:
+    with open("config.yaml", "r") as file:
+        config = yaml.safe_load(file)
+except FileNotFoundError:
+    with open("config.yaml", "w") as file:
+        config = {'difficulty': 9, 'drawings': 'default_drawings.py',
+                  'fullscreen': 'no', 'wordlist': 'words_alpha.txt'}
+        yaml.dump(config, file)
 
 banner = """
  █████   █████   █████████   ██████   █████   █████████  ██████   ██████   █████████   ██████   █████

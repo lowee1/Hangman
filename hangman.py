@@ -4,6 +4,7 @@ from random import choice
 import click
 import yaml
 from colorama import init
+import PySimpleGUI as sg
 
 import tui_graphics
 
@@ -14,8 +15,8 @@ try:
         config = yaml.safe_load(file)
 except FileNotFoundError:
     with open("config.yaml", "w") as file:
-        config = {'difficulty': 9, 'drawings': 'default_drawings.py',
-                  'fullscreen': 'no', 'wordlist': 'words_alpha.txt'}
+        config = {"difficulty": 9, "drawings": "default_drawings.py",
+                  "fullscreen": "no", "wordlist": "words_alpha.txt"}
         yaml.dump(config, file)
 
 
@@ -177,9 +178,37 @@ def gui():
     pass
 
 
-@gui.command()
+@gui.command(name="launch")
 def launch_gui():
-    raise NotImplementedError
+    sg.theme("DarkBlack")
+
+    layout = [[sg.Text("Hangman", font=("Arial", 60, "bold"), pad=(5, 40))],
+              [sg.HorizontalSeparator()],
+              [sg.Frame("Options", [[sg.Button("Play", font=("Arial", 30))],
+                                    [sg.Button(
+                                        "Settings", font=("Arial", 30))],
+                                    [sg.Button("Quit", font=("Arial", 30))]],
+                        element_justification="center",
+                        vertical_alignment="center",
+                        )
+               ],
+              ]
+
+    if config["fullscreen"] == "yes":
+        window = sg.Window("Hangman", layout,
+                           element_justification="center", finalize=True,
+                           no_titlebar=True, resizable=False, disable_minimize=True,
+                           debugger_enabled=True, force_toplevel=True)
+        window.Maximize()
+    else:
+        window = sg.Window("Hangman", layout,
+                           element_justification="center", debugger_enabled=True)
+
+    while True:
+        event, values = window.read()
+        if event == sg.WINDOW_CLOSED or event == "Quit":
+            break
+    window.close()
 
 
 if __name__ == "__main__":

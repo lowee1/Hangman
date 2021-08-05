@@ -8,6 +8,7 @@ click = "*"
 colorama = "*"
 pyyaml = "*"
 keyboard = "*"
+pysimplegui = "*"
 
 [dev-packages]
 flake8 = "*"

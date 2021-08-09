@@ -16,7 +16,7 @@ try:
 except FileNotFoundError:
     with open("config.yaml", "w") as file:
         config = {"difficulty": 9, "drawings": "default_drawings.py",
-                  "fullscreen": "no", "wordlist": "words_alpha.txt"}
+                  "fullscreen": "no", "wordlist": "words_alpha.txt", "images": "default_hangman_images.py"}
         yaml.dump(config, file)
 
 
@@ -77,11 +77,15 @@ def get_fullscreen_status():
 
 @tui.command(name="config")
 def tui_settings():
+    unsaved_edits = "No modifications"
     tui_graphics.centre_print(tui_graphics.settings_banner)
     while True:
-        tui_graphics.centre_print(tui_graphics.settings_menu)
+        current_settings_menu = tui_graphics.settings_menu.substitute(
+            new_wordlist_path=config["wordlist"], new_fullscreen=config["fullscreen"], unsaved_edits=unsaved_edits)
+        tui_graphics.centre_print(current_settings_menu)
         selected = click.prompt("Select option", show_choices=True,
                                 type=click.Choice(["1", "2", "3", "4", "5"]))
+        unsaved_edits = "You have unsaved edits"
         match selected:
             case "1":
                 new_wordlist = get_wordlist()
@@ -182,33 +186,74 @@ def gui():
 def launch_gui():
     sg.theme("DarkBlack")
 
-    layout = [[sg.Text("Hangman", font=("Arial", 60, "bold"), pad=(5, 40))],
-              [sg.HorizontalSeparator()],
-              [sg.Frame("Options", [[sg.Button("Play", font=("Arial", 30))],
-                                    [sg.Button(
-                                        "Settings", font=("Arial", 30))],
-                                    [sg.Button("Quit", font=("Arial", 30))]],
-                        element_justification="center",
-                        vertical_alignment="center",
-                        )
-               ],
-              ]
+    def make_menu():
+        menu_layout = [[sg.Text("Hangman", font=("Arial", 60, "bold"), pad=(5, 40))],
+                       [sg.HorizontalSeparator()],
+                       [sg.Column([[sg.Button("Play", font=("Arial", 30))],
+                                   [sg.Button(
+                                       "Settings", font=("Arial", 30))],
+                                   [sg.Button("Exit", font=("Arial", 30))]],
+                                  element_justification="center",
+                                  vertical_alignment="center",
+                                  )
+                        ],
+                       ]
 
-    if config["fullscreen"] == "yes":
-        window = sg.Window("Hangman", layout,
-                           element_justification="center", finalize=True,
-                           no_titlebar=True, resizable=False, disable_minimize=True,
-                           debugger_enabled=True, force_toplevel=True)
-        window.Maximize()
-    else:
-        window = sg.Window("Hangman", layout,
-                           element_justification="center", debugger_enabled=True)
+        if config["fullscreen"] == "yes":
+            menu_window = sg.Window("Hangman", menu_layout,
+                                    element_justification="center", finalize=True,
+                                    no_titlebar=True, resizable=False, keep_on_top=False)
+            menu_window.Maximize()
+        else:
+            menu_window = sg.Window("Hangman", menu_layout,
+                                    element_justification="center", finalize=True)
+        return menu_window
+
+    def make_play_window():
+        game_layout = [[sg.Image(filename=), sg.Text()],
+                       [sg.HorizontalSeparator()],
+                       [sg.Column(
+                           [
+                               [sg.Text("Please guess a letter")],
+                               [sg.InputText()],
+                               [sg.Submit("Guess")]
+                           ]),
+                        sg.Button("Quit Game", font=("Arial", 10))
+                        ]
+                       ]
+        if config["fullscreen"] == "yes":
+            play_window = sg.Window("play", game_layout,
+                                    element_justification="center", finalize=True,
+                                    no_titlebar=True, resizable=False)
+            play_window.Maximize()
+        else:
+            play_window = sg.Window("play", game_layout,
+                                    element_justification="center", finalize=True)
+        return play_window
+
+    menu_window, play_window = make_menu(), None
 
     while True:
-        event, values = window.read()
-        if event == sg.WINDOW_CLOSED or event == "Quit":
+        window, event, values = sg.read_all_windows()
+        if window == sg.WIN_CLOSED:
             break
-    window.close()
+        if event == sg.WIN_CLOSED or event == "Exit":
+            window.close()
+            if window == menu_window:
+                menu_window = None
+        elif event == "Play":
+            if not play_window:
+                play_window = make_play_window()
+                menu_window.close()
+                menu_window = None
+            while True:
+                window, event, values = sg.read_all_windows()
+
+                if event == sg.WIN_CLOSED or event == "Quit Game":
+                    window.close()
+                    play_window = None
+                    menu_window = make_menu()
+                    break
 
 
 if __name__ == "__main__":

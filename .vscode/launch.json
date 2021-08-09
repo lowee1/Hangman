@@ -5,6 +5,14 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "play gui hangman",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "args": ["gui", "launch"]
+        },
+        {
             "name": "play tui hangman",
             "type": "python",
             "request": "launch",
@@ -21,12 +29,12 @@
             "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal",
+            "justMyCode": false,
             "args": [
                 "tui",
                 "config"
             ]
         },
-
         {
             "name": "Python: Current File",
             "type": "python",

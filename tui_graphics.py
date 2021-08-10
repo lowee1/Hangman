@@ -83,12 +83,12 @@ def get_hangman_drawing(lives: int) -> str:
     return drawings.drawings[lives - 1]
 
 
-def get_hangman_image(lives: int) -> str:
+def get_hangman_image_path(lives: int) -> str:
     images_spec = importlib.util.spec_from_file_location(
         "images", config["images"])
     images = importlib.util.module_from_spec(images_spec)
     images_spec.loader.exec_module(images)
-    return images.get_image(lives)
+    return images.get_image_path(lives)
 
 
 def centre_print(text: str):

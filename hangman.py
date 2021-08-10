@@ -129,7 +129,7 @@ def get_letter_guess(guessed_letters: list) -> str:
 
 @tui.command(name="play")
 def play_tui():
-    if config["fullscreen"]:
+    if config["fullscreen"] == "yes":
         tui_graphics.fullscreen()
     click.clear()
     tui_graphics.centre_print(tui_graphics.banner)
@@ -210,17 +210,19 @@ def launch_gui():
         return menu_window
 
     def make_play_window():
-        game_layout = [[sg.Image(filename=), sg.Text()],
-                       [sg.HorizontalSeparator()],
-                       [sg.Column(
-                           [
-                               [sg.Text("Please guess a letter")],
-                               [sg.InputText()],
-                               [sg.Submit("Guess")]
-                           ]),
-                        sg.Button("Quit Game", font=("Arial", 10))
-                        ]
-                       ]
+        game_layout = [[
+            sg.Image(filename=tui_graphics.get_hangman_image_path(8), key="-image-"),
+            sg.Text()],
+            [sg.HorizontalSeparator()],
+            [sg.Column(
+                [
+                    [sg.Text("Please guess a letter")],
+                    [sg.InputText()],
+                    [sg.Submit("Guess")]
+                ]),
+             sg.Button("Quit Game", font=("Arial", 10))
+             ]
+        ]
         if config["fullscreen"] == "yes":
             play_window = sg.Window("play", game_layout,
                                     element_justification="center", finalize=True,

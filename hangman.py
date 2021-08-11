@@ -78,7 +78,9 @@ def get_fullscreen_status():
 @tui.command(name="config")
 def tui_settings():
     unsaved_edits = "No modifications"
+    click.clear()
     tui_graphics.centre_print(tui_graphics.settings_banner)
+    click.pause(info="Press any key...")
     while True:
         current_settings_menu = tui_graphics.settings_menu.substitute(
             new_wordlist_path=config["wordlist"], new_fullscreen=config["fullscreen"], unsaved_edits=unsaved_edits)

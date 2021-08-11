@@ -1,7 +1,8 @@
 from os import listdir
 
-image_paths = listdir("default_hangman_images")
+images_folder_path = "default_hangman_images"
+image_paths = listdir(images_folder_path)
 
 
-def get_image(lives: int) -> str:
-    return image_paths[lives]
+def get_image_path(lives: int) -> str:
+    return images_folder_path + "/" + image_paths[8 - lives]

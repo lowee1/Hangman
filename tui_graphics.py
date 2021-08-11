@@ -83,7 +83,7 @@ def width():
 
 
 def height():
-    height = shutil.get_terminal_size().columns
+    height = shutil.get_terminal_size().lines
     if height % 2 == 1:
         height -= 1
     return height

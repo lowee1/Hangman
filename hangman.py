@@ -79,6 +79,7 @@ def get_fullscreen_status():
 def tui_settings():
     unsaved_edits = "No modifications"
     click.clear()
+    click.echo("\n" * ((tui_graphics.height() - 12) // 2))
     tui_graphics.centre_print(tui_graphics.settings_banner)
     click.pause(info="Press any key...")
     while True:
@@ -219,7 +220,8 @@ def launch_gui():
 
     def make_play_window():
         game_layout = [[
-            sg.Image(filename=tui_graphics.get_hangman_image_path(8), key="-image-"),
+            sg.Image(filename=tui_graphics.get_hangman_image_path(
+                8), key="-image-"),
             sg.Text()],
             [sg.HorizontalSeparator()],
             [sg.Column(
@@ -264,7 +266,6 @@ def launch_gui():
                     play_window = None
                     menu_window = make_menu()
                     break
-                
 
 
 if __name__ == "__main__":

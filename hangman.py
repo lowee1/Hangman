@@ -19,10 +19,12 @@ except FileNotFoundError:
                   "fullscreen": "no", "wordlist": "words_alpha.txt", "images": "default_hangman_images.py"}
         yaml.dump(config, file)
 
-
 with open(config["wordlist"], "r") as file:
     words = file.read().splitlines()
-chosen_word = choice(words).upper()
+
+
+def pick_word():
+    return choice(words).upper()
 
 # main group so that help shows both gui and tui
 
@@ -143,6 +145,7 @@ def play_tui():
     click.clear()
     tui_graphics.centre_print(tui_graphics.banner)
 
+    chosen_word = pick_word()
     correct_letters = list(chosen_word)
     guessed_correct_letters = []
     guessed_incorrect_letters = []
@@ -223,13 +226,14 @@ def launch_gui():
             sg.Image(filename=tui_graphics.get_hangman_image_path(
                 8), key="-image-"),
             sg.Text()],
+            [sg.Text("", key="-word_display-")],
             [sg.HorizontalSeparator()],
             [sg.Column(
-                [
-                    [sg.Text("Please guess a letter")],
-                    [sg.InputText()],
+                [[sg.Text("Guessed letters: ", key="-letters-")],
+                    [sg.Text("Please guess a letter", key="-message-")],
+                    [sg.InputText(key="-input-")],
                     [sg.Submit("Guess")]
-                ]),
+                 ]),
              sg.Button("Quit Game", font=("Arial", 10))
              ]
         ]
@@ -258,12 +262,89 @@ def launch_gui():
                 play_window = make_play_window()
                 menu_window.close()
                 menu_window = None
-            while True:
-                window, event, values = sg.read_all_windows()
 
-                if event == sg.WIN_CLOSED or event == "Quit Game":
-                    window.close()
-                    play_window = None
+            chosen_word = pick_word()
+            correct_letters = list(chosen_word)
+            guessed_correct_letters = []
+            guessed_incorrect_letters = []
+            won = False
+            lives = 8
+
+            def update_gui_values():
+                play_window["-letters-"].update("Guessed letters: " + " ".join(
+                    guessed_correct_letters + guessed_incorrect_letters))
+                print(lives)
+                play_window["-image-"].update(
+                    tui_graphics.get_hangman_image_path(lives))
+                play_window["-input-"].update("")
+                play_window["-word_display-"].update(
+                    generate_word_display(guessed_correct_letters, correct_letters))
+
+            def make_end_window(won: bool):
+                end_layout = [
+                    [sg.Text("You won!" if won else "You lost")],
+                    [sg.Button("Back to main menu")]
+                ]
+
+                if config["fullscreen"] == "yes":
+                    end_window = sg.Window("Congratulations", end_layout,
+                                           element_justification="center", finalize=True,
+                                           no_titlebar=True, resizable=False)
+                    end_window.Maximize()
+                else:
+                    end_window = sg.Window("Congratulations", end_layout,
+                                           element_justification="center", finalize=True)
+                return end_window
+
+            while True:
+                update_gui_values()
+                event, values = play_window.read()
+                match event:
+                    case event if event == sg.WIN_CLOSED or event == "Quit Game":
+                        update_gui_values()
+                        play_window.close()
+                        play_window = None
+                        menu_window = make_menu()
+                    case event if event == "Guess":
+                        current_letter_guess = values["-input-"].upper()
+                        if (
+                                (error := check_valid_guess(
+                                    current_letter_guess,
+                                    guessed_correct_letters + guessed_incorrect_letters
+                                )
+                                ) != ""):
+                            play_window["-message-"].update(error)
+                        else:
+                            if current_letter_guess in correct_letters:
+                                guessed_correct_letters.append(
+                                    current_letter_guess)
+                                play_window["-message-"].update(
+                                    f"{current_letter_guess} is one of the letters")
+                            else:
+                                guessed_incorrect_letters.append(
+                                    current_letter_guess)
+                                play_window["-message-"].update(
+                                    f"{current_letter_guess} is not in the word")
+                                lives -= 1
+
+                            won = len(guessed_correct_letters) == len(
+                                set(correct_letters))
+
+                            if won or lives <= 0 or not play_window:
+                                play_window.close()
+                                play_window = None
+                                break
+
+            if won:
+                click.echo("You won")
+            else:
+                click.echo("You lost")
+            end_window = make_end_window(won)
+            while True:
+                event, values = end_window.read()
+                if event == sg.WIN_CLOSED or event == "Back to main menu":
+                    end_window.close()
+                    end_window = None
                     menu_window = make_menu()
                     break
 

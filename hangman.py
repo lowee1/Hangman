@@ -113,20 +113,26 @@ def generate_word_display(guessed_corrects: list, correct: list) -> str:
     )
 
 
+def check_valid_guess(guess: str, guessed_letters: list) -> str:
+    error = ""
+    match guess:
+        case guess if len(guess) != 1:
+            error = "Please enter one and only one letter"
+        case guess if guess not in string.ascii_uppercase:
+            error = "You did not enter a valid letter"
+        case guess if guess in guessed_letters:
+            error = "You have already guessed " + guess
+    return error
+
+
 def get_letter_guess(guessed_letters: list) -> str:
-    valid_guess = False
-    while not valid_guess:
+    while True:
         guess = click.prompt("Please guess a letter",
                              prompt_suffix=" -->> ").upper()
-        match guess:
-            case guess if len(guess) != 1:
-                click.echo("Please enter one and only one letter")
-            case guess if guess not in string.ascii_uppercase:
-                click.echo("You did not enter a valid letter")
-            case guess if guess in guessed_letters:
-                click.echo("You have already guessed " + guess)
-            case _:
-                return guess
+        if (error := check_valid_guess(guess, guessed_letters)) != "":
+            click.echo(error)
+            continue
+        return guess
 
 
 @tui.command(name="play")
@@ -258,6 +264,7 @@ def launch_gui():
                     play_window = None
                     menu_window = make_menu()
                     break
+                
 
 
 if __name__ == "__main__":

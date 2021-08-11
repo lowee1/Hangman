@@ -75,6 +75,20 @@ new: $new_fullscreen
 """)
 
 
+def width():
+    width = shutil.get_terminal_size().columns
+    if width % 2 == 1:
+        width -= 1
+    return width
+
+
+def height():
+    height = shutil.get_terminal_size().columns
+    if height % 2 == 1:
+        height -= 1
+    return height
+
+
 def get_hangman_drawing(lives: int) -> str:
     drawings_spec = importlib.util.spec_from_file_location(
         "drawings", config["drawings"])
@@ -92,12 +106,9 @@ def get_hangman_image_path(lives: int) -> str:
 
 
 def centre_print(text: str):
-    width = shutil.get_terminal_size().columns
-    if width % 2 == 1:
-        width -= 1
     lines = text.splitlines()
     for line in lines:
-        click.echo(line.center(width))
+        click.echo(line.center(width()))
 
 
 def fullscreen():

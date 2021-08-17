@@ -283,6 +283,7 @@ def launch_gui():
             def make_end_window(won: bool):
                 end_layout = [
                     [sg.Text("You won!" if won else "You lost")],
+                    [sg.Text("The word was " + chosen_word)],
                     [sg.Button("Back to main menu")]
                 ]
 
@@ -330,9 +331,7 @@ def launch_gui():
                             won = len(guessed_correct_letters) == len(
                                 set(correct_letters))
 
-                            if won or lives <= 0 or not play_window:
-                                play_window.close()
-                                play_window = None
+                            if won or lives <= 1 or not play_window:
                                 break
 
             if won:
@@ -343,6 +342,8 @@ def launch_gui():
             while True:
                 event, values = end_window.read()
                 if event == sg.WIN_CLOSED or event == "Back to main menu":
+                    play_window.close()
+                    play_window = None
                     end_window.close()
                     end_window = None
                     menu_window = make_menu()

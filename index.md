@@ -1,37 +1,32 @@
-## Welcome to GitHub Pages
+# Hangman
 
-You can use the [editor on GitHub](https://github.com/lowee1/Hangman/edit/gh-pages/index.md) to maintain and preview the content for your website in Markdown files.
+## Requirements
+- [python 3.10](https://www.python.org/downloads/release/python-3100rc1/)
+- [pipenv](https://pypi.org/project/pipenv/)
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
-
-### Markdown
-
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
-
-```markdown
-Syntax highlighted code block
-
-# Header 1
-## Header 2
-### Header 3
-
-- Bulleted
-- List
-
-1. Numbered
-2. List
-
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
+## Installation
+```
+git clone https://github.com/lowee1/Hangman.git
+cd Hangman
+pipenv install
 ```
 
-For more details see [Basic writing and formatting syntax](https://docs.github.com/en/github/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax).
+## Usage
+There is both a text-based and graphical user interface.
 
-### Jekyll Themes
+**IMPORTANT: You must run these commands inside the environment either by first running** `pipenv shell` **or by prepending** `pipenv run` **to every command.**
 
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/lowee1/Hangman/settings/pages). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
+### TUI
+`python hangman.py tui play` to play
+![tui play](tui-play.jpg)
 
-### Support or Contact
+`python hangman.py tui config` to change the settings
+![tui config](tui-config.jpg)
 
-Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://support.github.com/contact) and we’ll help you sort it out.
+_the fullscreen feature for the tui just sends the f11 key so it might not always work_
+
+### GUI
+`python hangman.py gui launch` to launch the gui
+![gui menu](gui-menu.jpg)
+
+_Note: the graphical settings feature has not been implemented yet_

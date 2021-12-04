@@ -28,4 +28,5 @@ _the fullscreen feature for the tui just sends the f11 key so it might not alway
 ### GUI
 `python hangman.py gui launch` to launch the gui
 ![gui menu](gui-menu.jpg)
+
 _Note: the graphical settings feature has not been implemented yet_
